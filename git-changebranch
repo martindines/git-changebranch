@@ -1,0 +1,36 @@
+#!/usr/bin/python
+
+import sys
+import subprocess
+
+def get_branches():
+	# Work out how to pass just a string to Popen instead of a list (maybe use os.system if pos)
+	command = ['git', 'branch', '-a', '--no-color']
+	branches = subprocess.Popen(command, stdout=subprocess.PIPE).stdout.readlines()
+
+	for index, value in enumerate(branches):
+		# Remove first 2 chars (white space & asterisk), new line char, and everything after first space
+		branches[index] = value[2:].rstrip('\n').split(None, 1)[0]
+	
+	return branches
+
+def print_branches(branches):
+	for index, value in enumerate(branches):
+		print "[%s] %s" % (index, value)
+
+def switch_branch(branch_index):
+	branch_name = get_branches()[branch_index]
+	command = ['git', 'checkout', branch_name]
+	subprocess.Popen(command)
+
+def handle_user_request():
+	requested_branch = raw_input('Select a branch: ')
+	if requested_branch:
+		switch_branch(int(requested_branch))
+
+def main():
+	branches = get_branches()
+	print_branches(branches)
+	handle_user_request()
+
+main()
